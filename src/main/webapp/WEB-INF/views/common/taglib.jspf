@@ -1,0 +1,12 @@
+<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%--
+  公共标签库声明。
+  每个 JSP 第一行就 include 这个文件，省得每页重复写三行 taglib。
+
+  trimDirectiveWhitespaces="true"：去掉指令产生的大量空行，
+  查看源码时 HTML 更干净（也减少一点点响应体积）。
+--%>
+<c:set var="ctx" value="${pageContext.request.contextPath}" />

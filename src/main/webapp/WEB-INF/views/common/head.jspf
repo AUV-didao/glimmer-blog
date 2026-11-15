@@ -1,0 +1,91 @@
+<%@ page pageEncoding="UTF-8" %>
+<%--
+  文件编码必须显式声明：被 include 的 .jspf 会单独按 ISO-8859-1 解码，
+  中文会变成「å¾®å…‰」这种乱码。这里重复声明与 taglib.jspf 相同的 UTF-8，
+  JSP 规范允许重复的 page 指令，只要属性值一致。
+--%>
+<c:set var="loginUser" value="${sessionScope.loginUser}" />
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="微光博客 · 技术分享与生活记录">
+    <title><c:out value="${empty pageTitle ? '首页' : pageTitle}" /> · 微光博客</title>
+    <meta name="csrf-token" content="<c:out value='${sessionScope.csrfToken}' />">
+    <link rel="stylesheet" href="${ctx}/assets/style.css?v=20261115-editorial">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='9' fill='%232f6e5f'/><text x='16' y='23' font-size='19' fill='white' text-anchor='middle' font-family='sans-serif'>微</text></svg>">
+</head>
+<body>
+<a class="skip-link" href="#main-content">跳到正文</a>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a class="brand" href="${ctx}/">
+            <span class="brand-mark">微</span>
+            <span>微光博客<span class="brand-sub">技术 · 生活 · 兴趣</span></span>
+        </a>
+
+        <nav class="main-nav" aria-label="主导航">
+            <a href="${ctx}/" class="${activeNav == 'home' ? 'active' : ''}">首页</a>
+            <a href="${ctx}/post/edit" class="${activeNav == 'write' ? 'active' : ''}">写文章</a>
+            <c:if test="${not empty loginUser && loginUser.admin}">
+                <a href="${ctx}/admin" class="${activeNav == 'admin' ? 'active' : ''}">后台</a>
+            </c:if>
+        </nav>
+
+        <div class="header-right">
+            <form class="search-form" action="${ctx}/" method="get" role="search">
+                <label class="sr-only" for="site-search">搜索文章</label>
+                <input id="site-search" type="search" name="keyword" placeholder="搜索文章…" value="<c:out value='${keyword}' />" maxlength="40">
+                <button class="search-submit" type="submit" aria-label="搜索">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg>
+                </button>
+            </form>
+
+            <span class="online-badge" title="当前在线访客数">
+                <span class="dot"></span>在线 ${applicationScope.onlineCount}
+            </span>
+
+            <c:choose>
+                <c:when test="${not empty loginUser}">
+                    <a class="notice-bell" href="${ctx}/notice" title="通知中心" aria-label="通知中心，${empty unreadCount ? 0 : unreadCount} 条未读">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 17h14l-2-3V9a5 5 0 0 0-10 0v5ZM10 20h4"/></svg><c:if test="${unreadCount > 0}"><span class="notice-dot"><c:out value="${unreadCount}" /></span></c:if>
+                    </a>
+                    <div class="user-chip">
+                        <c:choose>
+                            <c:when test="${not empty loginUser.avatar}">
+                                <img class="avatar" src="${ctx}<c:out value='${loginUser.avatar}' />" alt="头像">
+                            </c:when>
+                            <c:otherwise>
+                                <span class="avatar"><c:out value="${loginUser.initial}" /></span>
+                            </c:otherwise>
+                        </c:choose>
+                        <a class="nick" href="${ctx}/profile"><c:out value="${loginUser.displayName}" /></a>
+                        <form class="logout-form" action="${ctx}/logout" method="post">
+                            <input type="hidden" name="_csrf" value="<c:out value='${sessionScope.csrfToken}' />">
+                            <button class="btn btn-ghost btn-sm" type="submit">退出</button>
+                        </form>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="user-menu">
+                        <a class="btn btn-ghost btn-sm" href="${ctx}/login">登录</a>
+                        <a class="btn btn-primary btn-sm" href="${ctx}/register">注册</a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</header>
+
+<main class="container" id="main-content" tabindex="-1">
+    <c:if test="${not empty sessionScope.flashMessage}">
+        <div role="status" class="flash ${sessionScope.flashType == 'error' ? 'flash-error' : 'flash-success'}">
+            <span>${sessionScope.flashType == 'error' ? '⚠' : '✓'}</span>
+            <span><c:out value="${sessionScope.flashMessage}" /></span>
+        </div>
+        <%-- 提示只显示一次：显示完立刻从 Session 移除，刷新页面就不会再出现 --%>
+        <c:remove var="flashMessage" scope="session" />
+        <c:remove var="flashType" scope="session" />
+    </c:if>

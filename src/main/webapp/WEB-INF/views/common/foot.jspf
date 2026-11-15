@@ -1,0 +1,69 @@
+<%@ page pageEncoding="UTF-8" %>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div>
+            <div class="footer-title">微光博客</div>
+            <div>记录，是让微小的光亮停留。</div>
+        </div>
+        <div>
+            <div>© 2026 微光博客 · Web 服务器端开发期中大作业</div>
+            <div>累计访问 ${applicationScope.pageViews}<span class="dot-sep">/</span>在线 ${applicationScope.onlineCount}</div>
+            <div class="footer-tech">Servlet + JSP + JDBC + Filter + Listener · Tomcat 9</div>
+        </div>
+    </div>
+</footer>
+
+<%-- 原有点赞端点、登录跳转与 CSRF 协议保持不变；补充忙碌和失败反馈。 --%>
+<script>
+(function () {
+    var btn = document.querySelector('.like-btn');
+    if (!btn) return;
+    var feedback = document.getElementById('like-feedback');
+    btn.addEventListener('click', function () {
+        if (btn.disabled) return;
+        var postId = btn.getAttribute('data-post-id');
+        var body = new URLSearchParams();
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        var csrf = meta ? meta.getAttribute('content') : '';
+        body.append('id', postId);
+        body.append('_csrf', csrf);
+        btn.disabled = true;
+        btn.setAttribute('aria-busy', 'true');
+        if (feedback) feedback.textContent = '正在更新点赞…';
+        fetch(btn.getAttribute('data-action'), {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': csrf,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body.toString(),
+            credentials: 'same-origin'
+        }).then(function (resp) {
+            if (resp.status === 401) {
+                window.location.href = btn.getAttribute('data-login') + '?next=' + encodeURIComponent('/post?id=' + postId);
+                return null;
+            }
+            if (!resp.ok) throw new Error('request failed');
+            return resp.json();
+        }).then(function (data) {
+            if (!data) return;
+            if (!data.ok) throw new Error('update failed');
+            btn.classList.toggle('is-liked', data.liked);
+            btn.setAttribute('aria-pressed', String(data.liked));
+            btn.querySelector('.like-count').textContent = data.count;
+            btn.querySelector('.like-text').textContent = data.liked ? '已赞' : '点赞';
+            if (feedback) feedback.textContent = data.liked ? '已为这篇文章点赞。' : '已取消点赞。';
+        }).catch(function () {
+            if (feedback) feedback.textContent = '点赞未能更新，请稍后重试。';
+        }).then(function () {
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+        });
+    });
+})();
+</script>
+</body>
+</html>

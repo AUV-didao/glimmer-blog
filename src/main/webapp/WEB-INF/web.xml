@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>微光博客</display-name>
+
+    <!--
+      Servlet / Listener 仍用注解注册（@WebServlet / @WebListener）；
+      但 Filter 统一搬到这里声明，原因是「执行顺序」：
+
+        * web.xml 里 <filter-mapping> 的书写顺序 = 过滤器的执行顺序；
+        * 注解注册的过滤器由容器扫描决定顺序，多个过滤器互相依赖时不可控。
+
+      本项目有依赖关系：必须先把编码设好、再尝试「记住我」自动登录、
+      再统计未读通知、最后才判断登录与管理员权限。
+      顺序：编码 → 自动登录 → 未读徽标 → 登录拦截 → CSRF 校验 → 管理员权限。
+    -->
+
+    <!-- ① 统一编码：POST 中文不乱码（必须在读参数前执行） -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.EncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ② 记住我：读自己写的 Cookie，验签通过就重建登录态（必须在登录拦截之前） -->
+    <filter>
+        <filter-name>autoLoginFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.AutoLoginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>autoLoginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ③ 未读通知徽标：给页头铃铛准备 unreadCount -->
+    <filter>
+        <filter-name>noticeBadgeFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.NoticeBadgeFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>noticeBadgeFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- ④ 登录拦截：只拦「必须登录」的地址，浏览文章/搜索/详情放行 -->
+    <filter>
+        <filter-name>authFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>authFilter</filter-name>
+        <url-pattern>/post/edit</url-pattern>
+        <url-pattern>/post/save</url-pattern>
+        <url-pattern>/post/delete</url-pattern>
+        <url-pattern>/post/like</url-pattern>
+        <url-pattern>/comment/add</url-pattern>
+        <url-pattern>/comment/delete</url-pattern>
+        <url-pattern>/profile</url-pattern>
+        <url-pattern>/profile/avatar</url-pattern>
+        <url-pattern>/notice</url-pattern>
+        <url-pattern>/notice/read</url-pattern>
+    </filter-mapping>
+
+    <!-- ⑤ CSRF 防护：登录拦截之后校验（未登录请求先由 AuthFilter 给出 401/跳登录，
+         已登录的改数据请求必须带对令牌）。表单隐藏域或 X-CSRF-Token 请求头二者任一。 -->
+    <filter>
+        <filter-name>csrfFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.CsrfFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>csrfFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ⑥ 管理员权限：后台只放 role = ADMIN 的用户进 -->
+    <filter>
+        <filter-name>adminFilter</filter-name>
+        <filter-class>com.example.blog.web.filter.AdminFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>adminFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+    </filter-mapping>
+
+    <!-- 会话 2 小时过期（单位是分钟）。超时后 HttpSessionListener 会把在线人数减掉。 -->
+    <session-config>
+        <session-timeout>120</session-timeout>
+        <cookie-config>
+            <!-- HttpOnly：JS 读不到 Cookie，降低 XSS 偷 sessionId 的风险 -->
+            <http-only>true</http-only>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!-- 统一错误页：404/403/500 都走同一个 JSP，页面里用 errorTitle 区分文案 -->
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/views/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>500</error-code>
+        <location>/WEB-INF/views/error.jsp</location>
+    </error-page>
+    <error-page>
+        <exception-type>java.lang.Throwable</exception-type>
+        <location>/WEB-INF/views/error.jsp</location>
+    </error-page>
+</web-app>

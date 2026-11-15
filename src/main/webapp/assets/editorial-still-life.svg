@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 290" fill="none">
+  <title>纸页、枝叶与一盏微光</title>
+  <circle cx="283" cy="100" r="80" fill="#35553c"/>
+  <path d="M18 266H387" stroke="#688266"/>
+  <path d="M67 229 109 58 260 96 221 266Z" fill="#9aaa83"/>
+  <path d="m80 225 33-157 143 35-33 157Z" fill="#f1e8ce"/>
+  <path d="m113 68 7 159 103 33 33-157Z" fill="#fff7df"/>
+  <path d="m120 227 28-126M140 138l72 18M135 158l70 18M130 178l55 14" stroke="#b4b79a" stroke-width="2"/>
+  <path d="m190 94 12 40 9-12 14 4-12-26" fill="#c86b3e"/>
+  <path d="M242 266c11-58 23-111 48-168" stroke="#b5c69b" stroke-width="2"/>
+  <path d="M269 168c-41 1-48-24-45-45 32 4 47 17 45 45ZM280 139c-10-32 0-54 25-63 8 28 0 49-25 63ZM257 208c-34 0-53-16-55-39 30-2 49 13 55 39ZM274 169c33-25 57-23 71-6-27 22-48 24-71 6ZM261 208c30-25 55-23 68-6-22 21-47 27-68 6Z" fill="#91a789"/>
+  <path d="M280 266h61l8-59h-77Z" fill="#cc7748"/>
+  <path d="M277 215h67M287 226l3 31M301 226l1 31M316 226l-1 31M331 226l-3 31" stroke="#e6a67c"/>
+  <ellipse cx="75" cy="252" rx="38" ry="9" fill="#35553c"/>
+  <path d="M51 220h45l-4 27c-1 9-35 9-37 0Z" fill="#d5be87"/>
+  <path d="M96 224c22-4 19 20-3 16" stroke="#d5be87" stroke-width="6"/>
+  <path d="M67 209c-10-12 9-15 2-28M79 207c-7-9 8-13 4-22" stroke="#91a789" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="65" cy="96" r="5" fill="#d5be87"/>
+  <path d="M330 48v16m-8-8h16M47 161v12m-6-6h12" stroke="#d5be87" stroke-width="2"/>
+</svg>
