@@ -1,0 +1,21 @@
+# Local IDE and operating system files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+# Build output and local runtime state
+target/
+dist/
+.runtime/
+logs/
+*.log
+__pycache__/
+*.pyc
+data/*.db
+data/*.db-wal
+data/*.db-shm
+# Runtime uploads (seed database is intentionally tracked)
+src/main/webapp/upload/
+.env
+.env.*
