@@ -1,0 +1,7 @@
+<%-- 对参数做 URL 编码，保留关键词里的 +、& 等字符。 --%>
+<c:url var="listPageUrl" value="/">
+    <c:param name="page" value="${targetPage}" />
+    <c:if test="${not empty keyword}"><c:param name="keyword" value="${keyword}" /></c:if>
+    <c:if test="${not empty activeCategoryId}"><c:param name="categoryId" value="${activeCategoryId}" /></c:if>
+    <c:if test="${not empty activeTagId}"><c:param name="tagId" value="${activeTagId}" /></c:if>
+</c:url>

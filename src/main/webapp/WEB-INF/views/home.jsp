@@ -100,7 +100,9 @@
                     <nav class="pagination" aria-label="文章分页">
                         <c:choose>
                             <c:when test="${page.hasPrev}">
-                                <a href="${ctx}/?page=${page.prevPage}&keyword=${fn:escapeXml(keyword)}&categoryId=${activeCategoryId}&tagId=${activeTagId}">‹ 上一页</a>
+                                <c:set var="targetPage" value="${page.prevPage}" />
+                                <%@ include file="/WEB-INF/views/common/list-page-url.jspf" %>
+                                <a href="<c:out value='${listPageUrl}' />">‹ 上一页</a>
                             </c:when>
                             <c:otherwise><span class="disabled">‹ 上一页</span></c:otherwise>
                         </c:choose>
@@ -109,14 +111,18 @@
                             <c:choose>
                                 <c:when test="${i == page.page}"><span class="current" aria-current="page">${i}</span></c:when>
                                 <c:otherwise>
-                                    <a href="${ctx}/?page=${i}&keyword=${fn:escapeXml(keyword)}&categoryId=${activeCategoryId}&tagId=${activeTagId}">${i}</a>
+                                    <c:set var="targetPage" value="${i}" />
+                                    <%@ include file="/WEB-INF/views/common/list-page-url.jspf" %>
+                                    <a href="<c:out value='${listPageUrl}' />">${i}</a>
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
 
                         <c:choose>
                             <c:when test="${page.hasNext}">
-                                <a href="${ctx}/?page=${page.nextPage}&keyword=${fn:escapeXml(keyword)}&categoryId=${activeCategoryId}&tagId=${activeTagId}">下一页 ›</a>
+                                <c:set var="targetPage" value="${page.nextPage}" />
+                                <%@ include file="/WEB-INF/views/common/list-page-url.jspf" %>
+                                <a href="<c:out value='${listPageUrl}' />">下一页 ›</a>
                             </c:when>
                             <c:otherwise><span class="disabled">下一页 ›</span></c:otherwise>
                         </c:choose>

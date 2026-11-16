@@ -1,0 +1,10 @@
+*
+!Dockerfile
+!pom.xml
+!src/
+!src/**
+src/main/webapp/upload
+!sql/
+!sql/blog-seed.db
+!docker/
+!docker/entrypoint.sh

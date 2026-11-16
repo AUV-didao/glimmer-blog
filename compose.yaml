@@ -1,0 +1,15 @@
+name: glimmer-blog
+
+services:
+  blog:
+    build: .
+    ports:
+      - "127.0.0.1:${GLIMMER_PORT:-8087}:8080"
+    volumes:
+      - blog-data:/var/lib/glimmer
+      - blog-uploads:/usr/local/tomcat/webapps/blog/upload
+    restart: unless-stopped
+
+volumes:
+  blog-data:
+  blog-uploads:

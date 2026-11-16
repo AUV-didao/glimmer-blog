@@ -64,6 +64,21 @@ DAO 以 `XxxDao` 结尾，视图目录按业务模块分（auth / post / user / 
 
 ## 三、启动步骤
 
+### Docker 启动
+
+在项目目录执行 `docker compose up -d --build`，然后访问
+<http://127.0.0.1:8087/blog/>。第一次启动时，容器从 `sql/blog-seed.db`
+初始化 SQLite，其中有 54 篇公开演示文章、1 篇草稿和对应的评论及通知。
+已有数据库和上传文件保留在各自的 Docker 数据卷中。
+
+需要给从早期版本启动的容器补上这批文章时，可以在项目目录执行以下命令。
+脚本按作者和标题识别已导入的文章，增量补入缺少的示例及其关联记录。
+
+```powershell
+docker compose cp scripts/SeedDemo.java blog:/tmp/SeedDemo.java
+docker compose exec -T blog java -cp '/usr/local/tomcat/webapps/blog/WEB-INF/lib/*' /tmp/SeedDemo.java /var/lib/glimmer/blog.db
+```
+
 ### 1. 准备数据库
 
 项目已自带迁移后的 `data/blog.db`，不需要安装或启动 MySQL/PostgreSQL 等数据库服务。首次克隆或需要恢复演示数据时执行：
